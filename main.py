@@ -18,6 +18,14 @@ class Player(QtWidgets.QMainWindow):
         self.is_fullscreen = False
 
         self.create_ui()
+        
+    def keyPressEvent(self, event):
+        if event.key() == QtCore.Qt.Key_Escape and self.is_fullscreen:
+            self.set_fullscreen()
+        if event.key() == QtCore.Qt.Key_F11:
+            self.set_fullscreen()
+        if event.key() == QtCore.Qt.Key_Control and QtCore.Qt.Key_F4:
+            self.close()
 
     def create_ui(self):
         self.widget = QtWidgets.QWidget(self)
@@ -42,26 +50,46 @@ class Player(QtWidgets.QMainWindow):
         
         self.widget.setLayout(self.vboxlayout)
 
-        menu_bar = self.menuBar()
+        self.menu_bar = self.menuBar()
 
         # File menu
-        file_menu = menu_bar.addMenu("File")
+        self.file_menu = self.menu_bar.addMenu("File")
 
         # Add actions to file menu
-        open_action = QtGui.QAction("Set 4 view", self)
-        close_action = QtGui.QAction("Set 9 view", self)
+        quad_action = QtGui.QAction("Set 4 view", self)
+        nine_action = QtGui.QAction("Set 9 view", self)
         play_action = QtGui.QAction("Play", self)
-        file_menu.addAction(open_action)
-        file_menu.addAction(close_action)
-        file_menu.addAction(play_action)
+        full_screen_action = QtGui.QAction("Full Screen", self)
+        full_screen_action.setShortcut("F11")
+        quit_action = QtGui.QAction("Quit", self)
+        quit_action.setShortcut("Ctrl+F4")
+        
+        self.file_menu.addAction(quad_action)
+        self.file_menu.addAction(nine_action)
+        self.file_menu.addAction(play_action)
+        self.file_menu.addAction(full_screen_action)
+        self.file_menu.addAction(quit_action)
 
-        open_action.triggered.connect(self.set_layout_4)
-        close_action.triggered.connect(self.set_layout_9)
+        quad_action.triggered.connect(self.set_layout_4)
+        nine_action.triggered.connect(self.set_layout_9)
         play_action.triggered.connect(self.play)
+        full_screen_action.triggered.connect(self.set_fullscreen)
+        quit_action.triggered.connect(self.close)
     
     def play(self):
         for mediaplayer in self.mediaplayers:
             mediaplayer.play()
+    
+    def set_fullscreen(self):
+        if self.is_fullscreen:
+            self.showNormal()
+            # menmubar가 보이게
+            self.menu_bar.show()
+        else:
+            self.showFullScreen()
+            self.menu_bar.hide()
+            self.setShortcutEnabled(True)
+        self.is_fullscreen = not self.is_fullscreen
 
     def set_layout_9(self):
         self.clear_layouts()
@@ -102,8 +130,6 @@ def main():
     player.show()
     player.resize(640, 480)
     player.set_layout_9()
-    # devices = player.get_devices()
-    # player.mediaplayer.audio_output_device_set(devices[1]["device"], devices[1]["description"])
     
     sys.exit(app.exec_())
 
