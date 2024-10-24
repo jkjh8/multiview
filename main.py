@@ -14,6 +14,8 @@ class Player(QtWidgets.QMainWindow):
         self.instances = [vlc.Instance() for _ in range(9)]
         # Create an empty vlc media player
         self.mediaplayers = [instance.media_player_new() for instance in self.instances]
+        # fullscreen
+        self.is_fullscreen = False
 
         self.create_ui()
 
@@ -27,6 +29,11 @@ class Player(QtWidgets.QMainWindow):
             palette.setColor(QtGui.QPalette.Window, QtGui.QColor(0, 0, 0))
             self.videoframes[i].setPalette(palette)
             self.videoframes[i].setAutoFillBackground(True)
+        # player에 할당
+        for i in range(9):
+            self.mediaplayers[i].set_hwnd(self.videoframes[i].winId())
+            self.mediaplayers[i].set_mrl("rtp://@239.12.12.12:5004")
+            
         # layouts
         self.vboxlayout = QtWidgets.QVBoxLayout()
         self.hboxlayouts = [QtWidgets.QHBoxLayout() for _ in range(3)]
@@ -43,11 +50,18 @@ class Player(QtWidgets.QMainWindow):
         # Add actions to file menu
         open_action = QtGui.QAction("Set 4 view", self)
         close_action = QtGui.QAction("Set 9 view", self)
+        play_action = QtGui.QAction("Play", self)
         file_menu.addAction(open_action)
         file_menu.addAction(close_action)
+        file_menu.addAction(play_action)
 
         open_action.triggered.connect(self.set_layout_4)
         close_action.triggered.connect(self.set_layout_9)
+        play_action.triggered.connect(self.play)
+    
+    def play(self):
+        for mediaplayer in self.mediaplayers:
+            mediaplayer.play()
 
     def set_layout_9(self):
         self.clear_layouts()
