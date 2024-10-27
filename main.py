@@ -57,4 +57,4 @@ if __name__ == "__main__":
     player.resize(640, 480)
     player.set_layout_9()
     player.play(0)
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
