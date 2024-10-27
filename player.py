@@ -1,4 +1,4 @@
-import sys, vlc
+import sys, vlc, platform
 from PySide6 import QtWidgets, QtGui, QtCore
 
 class Player(QtWidgets.QMainWindow):
@@ -32,8 +32,13 @@ class Player(QtWidgets.QMainWindow):
         
         # Assign media players to frames
         for i, player in enumerate(self.mediaplayers):
-            player.set_hwnd(self.videoframes[i].winId())
-            player.set_mrl("udp://@239.12.12.12:5004")
+            if platform.system() == "Windows":
+                player.set_hwnd(self.videoframes[i].winId())
+            elif platform.system() == "Darwin":
+                player.set_nsobject(int(self.videoframes[i].winId()))
+            else:
+                player.set_xwindow(self.videoframes[i].winId())
+            player.set_mrl("udp://@239.12.12.12:1234")
             
         # Layouts
         self.vboxlayout = QtWidgets.QVBoxLayout()
